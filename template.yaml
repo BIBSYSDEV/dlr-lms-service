@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Lambda with lms functionality
+
+Parameters:
+  CognitoAuthorizerArn:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: Reference to Cognito UserPool for the stage
+    Default: CognitoAuthorizerArn
+  CustomDomain:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: The default domain that is used as from_address
+    Default: CustomDomain
+  CustomDomainBasePath:
+    Type: String
+    Description: Base path mapping in CustomDomain
+    Default: email
+  ApiDomain:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: The Api domain
+    Default: /NVA/ApiDomain
+
+Globals:
+  Function:
+    Timeout: 900
+    MemorySize: 1798
+    Runtime: java11
+
+Resources:

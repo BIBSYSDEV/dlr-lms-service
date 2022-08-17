@@ -1,0 +1,6 @@
+enableFeaturePreview('VERSION_CATALOGS')
+
+rootProject.name = 'dlr-lms-service'
+include 'lms-canvas'
+
+

@@ -1,0 +1,14 @@
+dependencies {
+
+    implementation libs.nva.core
+    implementation libs.nva.apigateway
+
+    implementation libs.aws.ses
+    implementation libs.bundles.logging
+
+    testImplementation libs.nva.testutils
+}
+
+test{
+
+}
