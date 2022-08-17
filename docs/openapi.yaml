@@ -1,37 +1,26 @@
 openapi: 3.0.0
 info:
   version: '1.0'
-  title: 'email'
+  title: 'lms'
   license:
     name: MIT
-x-amazon-apigateway-request-validators:
-  body_only:
-    validateRequestBody: true
-    validateRequestParameters: false
 paths:
-  /email:
+  /lms:
     post:
-      summary: 'Sample endpoint: Sends an email with specified content'
+      summary: ''
       operationId: postEmail
       security:
         - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend']
       tags:
         - email
-      x-amazon-apigateway-request-validator: body_only
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DlrNvaEmailServiceFunction.Arn}/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DlrLmsServiceFunction.Arn}/invocations
         httpMethod: POST
         type: AWS_PROXY
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Email'
       responses:
         '201':
-          description: 'Email sent successfully'
+          description: ''
           content:
             application/json:
               schema:
@@ -61,42 +50,6 @@ components:
           - Ref:
               CognitoAuthorizerArn
   schemas:
-    Email:
-      type: object
-      required:
-        - to_address
-        - subject
-        - text_html
-        - text
-      properties:
-        from_address:
-          type: string
-          minLength: 3
-          maxLength: 256
-        to_address:
-          type: string
-          minLength: 3
-          maxLength: 256
-        subject:
-          type: string
-          minLength: 3
-          maxLength: 256
-        cc:
-          type: string
-          minLength: 3
-          maxLength: 256
-        bcc:
-          type: string
-          minLength: 3
-          maxLength: 256
-        text:
-          type: string
-          maxLength: 65000
-        text_html:
-          type: string
-          maxLength: 65000
-    Response:
-      type: string
     Error:
       type: object
       required:

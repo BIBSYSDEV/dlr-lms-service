@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Lambda with lms functionality
+  Lambda sending emails
 
 Parameters:
   CognitoAuthorizerArn:
@@ -28,3 +28,66 @@ Globals:
     Runtime: java11
 
 Resources:
+  DlrLmsServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ lambda.amazonaws.com ]
+            Action: [ 'sts:AssumeRole' ]
+      Policies:
+        - PolicyName: writeLog
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*'
+
+  LmsGatewayAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: v1
+      EndpointConfiguration:
+        Type: REGIONAL
+      MethodSettings:
+        - ResourcePath: /lms
+          HttpMethod: POST
+      DefinitionBody:
+        'Fn::Transform':
+          Name: AWS::Include
+          Parameters:
+            Location: ./docs/openapi.yaml
+
+  DlrLmsServiceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lms-canvas
+      Handler: no.sikt.nva.lms.LmsRequestHandler::handleRequest
+      Role: !GetAtt DlrLmsServiceRole.Arn
+      Runtime: java11
+      MemorySize: 1798
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+      Events:
+        SendEmailRequest:
+          Type: Api
+          Properties:
+            RestApiId: !Ref LmsGatewayAPI
+            Method: post
+            Path: /lms
+
+  LmsServiceBasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: !Sub ${CustomDomainBasePath}
+      DomainName: !Ref ApiDomain
+      RestApiId: !Ref LmsGatewayAPI
+      Stage: !Ref LmsGatewayAPI.Stage

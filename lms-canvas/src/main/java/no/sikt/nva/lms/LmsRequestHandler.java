@@ -1,7 +1,6 @@
 package no.sikt.nva.lms;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.HttpURLConnection;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -16,11 +15,6 @@ public class LmsRequestHandler extends ApiGatewayHandler {
 
     public LmsRequestHandler(Class iclass, Environment environment) {
         super(iclass, environment);
-    }
-
-    public LmsRequestHandler(Class iclass, Environment environment,
-                             ObjectMapper objectMapper) {
-        super(iclass, environment, objectMapper);
     }
 
     @Override
