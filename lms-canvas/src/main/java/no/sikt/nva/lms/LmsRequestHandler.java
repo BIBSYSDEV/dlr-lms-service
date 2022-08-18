@@ -7,18 +7,20 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-@JacocoGenerated
 public class LmsRequestHandler extends ApiGatewayHandler {
 
+    @JacocoGenerated
     public LmsRequestHandler(Class iclass, Environment environment) {
         super(iclass, environment);
     }
 
+    @JacocoGenerated
     @Override
     protected String processInput(Object input, RequestInfo requestInfo, Context context) {
         return "Hello world";
     }
 
+    @JacocoGenerated
     @Override
     protected Integer getSuccessStatusCode(Object input, Object output) {
         return HttpURLConnection.HTTP_OK;
