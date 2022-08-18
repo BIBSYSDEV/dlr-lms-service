@@ -5,7 +5,9 @@ import java.net.HttpURLConnection;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
 
+@JacocoGenerated
 public class LmsRequestHandler extends ApiGatewayHandler {
 
     public LmsRequestHandler(Class iclass, Environment environment) {
