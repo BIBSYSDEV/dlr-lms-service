@@ -2,12 +2,16 @@ dependencies {
 
     implementation libs.nva.core
     implementation libs.nva.apigateway
+    implementation libs.nva.json
 
     implementation libs.bundles.logging
+    implementation libs.bundles.jackson
 
     testImplementation libs.nva.testutils
+
 }
 
 test{
+    environment "ALLOWED_ORIGIN", "* "
 
 }
