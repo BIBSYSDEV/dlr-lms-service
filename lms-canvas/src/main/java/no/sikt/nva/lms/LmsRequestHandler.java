@@ -9,7 +9,6 @@ import nva.commons.core.JacocoGenerated;
 
 public class LmsRequestHandler extends ApiGatewayHandler<Void, Void> {
 
-    @JacocoGenerated
     public LmsRequestHandler(Class iclass, Environment environment) {
         super(iclass, environment);
     }
