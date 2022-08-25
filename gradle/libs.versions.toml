@@ -8,7 +8,7 @@ slf4j = '1.8.0-beta4'
 awslog4j2 = '1.5.1'
 awsSesSDk = '1.12.254'
 jacksonVersion = { strictly = "2.13.3" }
-
+awsevents = '3.11.0'
 
 [libraries]
 nva-core = { group = "com.github.bibsysdev", name = "core", version.ref = "nva" }
@@ -36,7 +36,7 @@ log4j-api = { group = 'org.apache.logging.log4j', name = 'log4j-api', version.re
 log4j-slf4j18-impl = { group = 'org.apache.logging.log4j', name = 'log4j-slf4j18-impl', version.ref = 'log4j' }
 slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }
 aws-lambda-log4j2 = { group = 'com.amazonaws', name = 'aws-lambda-java-log4j2', version.ref = 'awslog4j2'}
-
+aws-events = { group = 'com.amazonaws', name = 'aws-lambda-java-events', version.ref = 'awsevents'}
 
 [bundles]
 testing = ["mockito-core", "hamcrest-base", "hamcrest-core", "junit-jupiter-engine", "junit-jupiter-params",
