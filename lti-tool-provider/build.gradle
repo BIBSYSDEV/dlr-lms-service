@@ -1,0 +1,8 @@
+
+dependencies {
+    implementation libs.nva.core
+    implementation libs.aws.events
+}
+
+test{
+}
