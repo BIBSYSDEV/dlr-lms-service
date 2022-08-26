@@ -2,48 +2,54 @@ package sikt.lti.tp;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import nva.commons.core.StringUtils;
 import nva.commons.core.paths.UnixPath;
 import nva.commons.core.paths.UriWrapper;
 import sikt.lti.tp.cc.CommonCartridgeGenerator;
 import sikt.lti.tp.cc.TemplateBasedCommonCartridgeGenerator;
 
-public abstract class LtiLaunchHandler {
+public class LtiLaunchHandler {
 
     private static final String APPLICATION_XML = "application/xml; charset=utf-8";
     private static final String TEXT_PLAIN = "text/plain; charset=utf-8";
     private static final String TEXT_HTML = "text/html; charset=utf-8";
+    private static final String SUPPORTED_LTI_MESSAGE_TYPE = "basic-lti-launch-request";
+    private static final String SUPPORTED_LTI_VERSION = "LTI-1p0";
 
     private final URI apiBaseUrl;
     private final URI dlrBaseUrl;
     private final String path;
     private final Map<String, String> parameters;
-    private final Map<String, Consumer> consumerByKeyMap;
+    private final Set<String> knownConsumerKeys;
     private final CommonCartridgeGenerator commonCartridgeGenerator = new TemplateBasedCommonCartridgeGenerator();
 
     protected LtiLaunchHandler(final URI apiBaseUrl,
-                               URI dlrBaseUrl, final String path,
+                               final URI dlrBaseUrl,
+                               final String path,
                                final Map<String, String> parameters,
-                               final Map<String, Consumer> consumerByKeyMap) {
+                               final Set<String> knownConsumerKeys) {
         this.apiBaseUrl = apiBaseUrl;
         this.dlrBaseUrl = dlrBaseUrl;
         this.path = path;
         this.parameters = parameters;
-        this.consumerByKeyMap = consumerByKeyMap;
+        this.knownConsumerKeys = knownConsumerKeys;
     }
 
     public LtiLaunchResult execute() {
-        final ServiceIdentifier serviceIdentifier = getServiceIdentifier(path);
-        if (serviceIdentifier == null) {
+        final Optional<ServiceIdentifier> serviceIdentifier = getServiceIdentifier(path);
+
+        if (serviceIdentifier.isEmpty()) {
             return new LtiLaunchResult(200, TEXT_HTML, generateListOfServicesAsHtml());
         }
 
         LtiLaunchResult result;
         if (parameters.isEmpty()) {
-            final String body = commonCartridgeGenerator.generate(serviceIdentifier, apiBaseUrl);
-            result =  new LtiLaunchResult(200, APPLICATION_XML, body);
+            final String body = commonCartridgeGenerator.generate(serviceIdentifier.get(), apiBaseUrl);
+            result = new LtiLaunchResult(200, APPLICATION_XML, body);
         } else {
-            result = handleLtiLaunchRequest(serviceIdentifier, parameters);
+            result = handleLtiLaunchRequest(serviceIdentifier.get(), parameters);
         }
         return result;
     }
@@ -51,22 +57,19 @@ public abstract class LtiLaunchHandler {
     private LtiLaunchResult handleLtiLaunchRequest(final ServiceIdentifier serviceIdentifier,
                                                    final Map<String, String> parameters) {
         final String oauthConsumerKey = parameters.get(LtiLaunchParameter.OAUTH_CONSUMER_KEY.getValue());
-        if (StringUtils.isEmpty(oauthConsumerKey)) {
-            return new LtiLaunchResult(401, TEXT_PLAIN, "Missing required param &#39;oauth_consumer_key&#39;");
-        }
         final String ltiMessageType = parameters.get(LtiLaunchParameter.LTI_MESSAGE_TYPE.getValue());
-        if (StringUtils.isEmpty(ltiMessageType)) {
-            return new LtiLaunchResult(401, TEXT_PLAIN, "Missing required param &#39;lti_message_type&#39;");
-        }
         final String ltiVersion = parameters.get(LtiLaunchParameter.LTI_VERSION.getValue());
-        if (StringUtils.isEmpty(ltiVersion)) {
-            return new LtiLaunchResult(401, TEXT_PLAIN, "Missing required param &#39;lti_version&#39;");
-        }
         final String resourceLinkId = parameters.get(LtiLaunchParameter.RESOURCE_LINK_ID.getValue());
-        if (StringUtils.isEmpty(resourceLinkId)) {
-            return new LtiLaunchResult(401, TEXT_PLAIN, "Missing required param &#39;resource_link_id&#39;");
-        }
+        @SuppressWarnings("PMD.PrematureDeclaration") // todo: for now
         final String returnUrl = parameters.get(LtiLaunchParameter.LAUNCH_PRESENTATION_RETURN_URL.getValue());
+
+        final LtiLaunchResult constraintCheckResult = checkLaunchParameterConstraints(oauthConsumerKey,
+                                                                                      ltiMessageType,
+                                                                                      ltiVersion,
+                                                                                      resourceLinkId);
+        if (constraintCheckResult != null) {
+            return constraintCheckResult;
+        }
 
         final LtiLaunchResult result;
         switch (serviceIdentifier) {
@@ -77,66 +80,98 @@ public abstract class LtiLaunchHandler {
                 result = handleEmbedExternalToolLaunch(returnUrl);
                 break;
             case embedRichContentEditor:
-                result = handleEmbedRichContentEditorLaunch();
+                result = handleEmbedRichContentEditorLaunch(returnUrl);
                 break;
             case combined:
             default:
-                result = new LtiLaunchResult(500, "", "");
+                result = new LtiLaunchResult(200, TEXT_HTML, generateListOfServicesAsHtml());
                 break;
         }
         return result;
     }
 
-    private LtiLaunchResult handleEmbedExternalToolLaunch(final String returnUrl) {
-        final String redirectLocation = UriWrapper.fromUri(dlrBaseUrl)
-            .addQueryParameter("forceAuthentication", "true")
-            .addQueryParameter("canvasShowEmbedLinkButton", "true")
-            .addQueryParameter("canvasIframeResize", "true")
-            .addQueryParameter("canvasLaunchPresentationReturnUrl", returnUrl)
-            .toString();
-        return new LtiLaunchResult(304, "", redirectLocation);
+    private LtiLaunchResult checkLaunchParameterConstraints(final String oauthConsumerKey,
+                                                            final String ltiMessageType,
+                                                            final String ltiVersion,
+                                                            final String resourceLinkId) {
+        if (StringUtils.isEmpty(oauthConsumerKey)) {
+            return new LtiLaunchResult(401, TEXT_PLAIN, "Missing required param 'oauth_consumer_key'");
+        } else if (StringUtils.isEmpty(ltiMessageType)) {
+            return new LtiLaunchResult(401, TEXT_PLAIN, "Missing required param 'lti_message_type'");
+        } else if (StringUtils.isEmpty(ltiVersion)) {
+            return new LtiLaunchResult(401, TEXT_PLAIN, "Missing required param 'lti_version'");
+        } else if (StringUtils.isEmpty(resourceLinkId)) {
+            return new LtiLaunchResult(401, TEXT_PLAIN, "Missing required param 'resource_link_id'");
+        } else if (!SUPPORTED_LTI_MESSAGE_TYPE.equals(ltiMessageType)) {
+            final String body = String.format("Only supports value '%s' for param '%s'",
+                                              SUPPORTED_LTI_MESSAGE_TYPE,
+                                              LtiLaunchParameter.LTI_MESSAGE_TYPE.getValue());
+            return new LtiLaunchResult(401, TEXT_PLAIN, body);
+        } else if (!SUPPORTED_LTI_VERSION.equals(ltiVersion)) {
+            final String body = String.format("Only supports value '%s' for param '%s'", SUPPORTED_LTI_VERSION,
+                                              LtiLaunchParameter.LTI_VERSION.getValue());
+            return new LtiLaunchResult(401, TEXT_PLAIN, body);
+        } else if (!knownConsumerKeys.contains(oauthConsumerKey)) {
+            return new LtiLaunchResult(401, TEXT_PLAIN, "Unknown consumer");
+        } else {
+            return null;
+        }
     }
 
-    private LtiLaunchResult handleEmbedRichContentEditorLaunch() {
-        return null;
+    private LtiLaunchResult handleEmbedExternalToolLaunch(final String returnUrl) {
+        final String location = UriWrapper.fromUri(dlrBaseUrl)
+                                    .addQueryParameter("forceAuthentication", Boolean.toString(true))
+                                    .addQueryParameter("canvasShowEmbedLinkButton", Boolean.toString(true))
+                                    .addQueryParameter("canvasIframeResize", Boolean.toString(true))
+                                    .addQueryParameter("canvasLaunchPresentationReturnUrl", returnUrl)
+                                    .toString();
+        return new LtiLaunchResult(location);
+    }
+
+    private LtiLaunchResult handleEmbedRichContentEditorLaunch(final String returnUrl) {
+        final String location = UriWrapper.fromUri(dlrBaseUrl)
+                                    .addQueryParameter("forceAuthentication", Boolean.toString(true))
+                                    .addQueryParameter("canvasShowEmbedButton", Boolean.toString(true))
+                                    .addQueryParameter("canvasIframeResize", Boolean.toString(true))
+                                    .addQueryParameter("canvasLaunchPresentationReturnUrl", returnUrl)
+                                    .toString();
+        return new LtiLaunchResult(location);
     }
 
     private LtiLaunchResult handleSiteLaunch() {
-        return null;
+        final String location = UriWrapper.fromUri(dlrBaseUrl)
+                                    .addQueryParameter("forceAuthentication", Boolean.toString(true))
+                                    .addQueryParameter("canvasIframeResize", Boolean.toString(true))
+                                    .toString();
+        return new LtiLaunchResult(location);
     }
 
     private String generateListOfServicesAsHtml() {
-        final StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder(256);
 
-        builder.append("<html>\n");
-        builder.append("<body>\n");
-
-        builder.append("Available LTI services:<br/><br/>\n");
+        builder.append("<html>\n<body>\nAvailable LTI services:<br/><br/>\n");
 
         for (ServiceIdentifier identifier : ServiceIdentifier.values()) {
             final UriWrapper uriWrapper = UriWrapper.fromUri(apiBaseUrl)
                                               .addChild("lms", "canvas", "v1", identifier.name());
             final String url = uriWrapper.toString();
             builder.append("<a href=\"")
-                .append(uriWrapper.toString())
+                .append(uriWrapper)
                 .append("\">")
                 .append(url)
                 .append("</a><br/>\n");
         }
 
-        builder.append("</body>\n");
-        builder.append("</html>");
-
-        return builder.toString();
+        return builder.append("</body>\n</html>").toString();
     }
 
-    private ServiceIdentifier getServiceIdentifier(final String path) {
+    private Optional<ServiceIdentifier> getServiceIdentifier(final String path) {
         final UnixPath unixPath = UnixPath.fromString(path);
 
         try {
-            return ServiceIdentifier.valueOf(unixPath.getLastPathElement());
+            return Optional.of(ServiceIdentifier.valueOf(unixPath.getLastPathElement()));
         } catch (IllegalArgumentException e) {
-            return null;
+            return Optional.empty();
         }
     }
 }
