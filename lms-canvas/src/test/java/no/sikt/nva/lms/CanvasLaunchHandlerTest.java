@@ -44,7 +44,7 @@ public class CanvasLaunchHandlerTest {
     @Test
     void shouldReturnHTMLOnLaunchRequestWithoutServiceIdentifier() throws IOException {
         var expectedHTML = constructTest("inputWithoutServiceId.json").getBody();
-        assertThat(expectedHTML, is(IoUtils.stringFromResources(Path.of("ListOfServices.html"))));
+        assertThat(expectedHTML, is(IoUtils.stringFromResources(Path.of("listOfServices.html"))));
     }
 
     @Test
