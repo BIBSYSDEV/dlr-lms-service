@@ -35,10 +35,7 @@ paths:
                 $ref: '#/components/schemas/HTML'
         '304':
           description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Json'
+
         '500':
           description: Unexpected error
           content:
@@ -65,8 +62,7 @@ components:
         name: cartridge_basiclti_link
     HTML:
       type: object
-    Json:
-      type: object
+
 
 
 
