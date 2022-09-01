@@ -61,10 +61,9 @@ components:
     Error:
       type: object
       required:
-        - code
-        - message
         - detail
         - title
+        - status
     Cartridge:
       type: object
       xml:

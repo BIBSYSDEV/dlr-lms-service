@@ -66,6 +66,12 @@ public class CanvasLaunchHandlerTest {
         assertThat(actualJsonError, is(IoUtils.stringFromResources(Path.of("unknownConsumerResponse.json"))));
     }
 
+    @Test
+    void shouldConvert500ResponseToJsonError() throws IOException {
+        var actualJsonError = constructTest("inputWithoutPathParameter.json").getBody();
+        assertThat(actualJsonError, is(IoUtils.stringFromResources(Path.of("500ServerResponse.json"))));
+    }
+
     private GatewayResponse<LtiLaunchHandler> constructTest(String requestJson) throws IOException {
         var input = createRequest(requestJson);
         handler.handleRequest(input, output, context);
