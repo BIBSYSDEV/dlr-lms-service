@@ -64,6 +64,14 @@ components:
         - detail
         - title
         - status
+      properties:
+        detail:
+          type: string
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
     Cartridge:
       type: object
       xml:
