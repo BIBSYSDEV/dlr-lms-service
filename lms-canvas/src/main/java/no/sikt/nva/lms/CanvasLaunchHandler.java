@@ -8,29 +8,35 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
+import nva.commons.core.Environment;
 import sikt.lti.tp.aws.ApiGatewayLambdaLaunchHandler;
 
 public class CanvasLaunchHandler extends ApiGatewayHandler<Void, String> {
 
-    private static final URI DLR_BASE_URL = URI.create("https://dlr.unit.no");
-    private static final URI API_HOST = URI.create("https://api.loke.aws.unit.no");
+    private static final String DLR_BASE_URL = "DLR_BASE_URL";
+    private static final String API_HOST = "API_HOST";
     private final Set<String> knownConsumerKeys = new ConcurrentSkipListSet<>();
+    private final URI baseUrl;
+    private final URI apiHost;
 
-    public CanvasLaunchHandler() {
-        super(Void.class);
+    public CanvasLaunchHandler(Environment environment) {
+        super(Void.class, environment);
+        baseUrl = URI.create(environment.readEnv(DLR_BASE_URL));
+        apiHost = URI.create(environment.readEnv(API_HOST));
     }
 
     @Override
-    protected String processInput(Void input, RequestInfo requestInfo, Context context) {
+    protected String processInput(Void input, RequestInfo requestInfo, Context context) throws LaunchException {
         // todo: add knownConsumerKeys i secrets? should be uploaded on runtime
 
         knownConsumerKeys.add("key");
-        ApiGatewayLambdaLaunchHandler handler = new ApiGatewayLambdaLaunchHandler(API_HOST, DLR_BASE_URL,
-                                                                                  knownConsumerKeys, requestInfo);
+        ApiGatewayLambdaLaunchHandler handler = new ApiGatewayLambdaLaunchHandler(apiHost, baseUrl, knownConsumerKeys,
+                                                                                  requestInfo);
         var launchResult = handler.execute();
         String result;
-
-        if (launchResult.getStatus() == HttpURLConnection.HTTP_NOT_MODIFIED) {
+        if (launchResult.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            throw new LaunchException(launchResult.getBody(), launchResult.getStatus());
+        } else if (launchResult.getStatus() == HttpURLConnection.HTTP_NOT_MODIFIED) {
             addAdditionalHeaders(() -> Collections.singletonMap("Location", launchResult.getLocation()));
             result = "";
         } else {

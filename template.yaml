@@ -58,7 +58,7 @@ Resources:
         Type: REGIONAL
       MethodSettings:
         - ResourcePath: /lms
-          HttpMethod: GET
+          HttpMethod: POST
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include
@@ -82,6 +82,8 @@ Resources:
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
+          API_HOST: !Ref ApiDomain
+          DLR_BASE_URL: !Ref ApiDomain
         PutEvent:
 
   LmsCanvasBasePathMapping:

@@ -19,9 +19,13 @@ import sikt.lti.tp.LtiLaunchHandler;
 
 public class CanvasLaunchHandlerTest {
 
+    public static final String DLR_BASE_URL_VALUE = "https://dlr.unit.no";
+    public static final String API_HOST_VALUE = "https://api.loke.aws.unit.no";
     private static final String EXPECTED_LOCATION_FOR_EMBED_RICH_CONTENT_EDITOR =
         "https://dlr.unit.no?forceAuthentication=true&canvasShowEmbedButton"
         + "=true&canvasIframeResize=true&canvasLaunchPresentationReturnUrl=https://example.com";
+    private static final String DLR_BASE_URL = "DLR_BASE_URL";
+    private static final String API_HOST = "API_HOST";
     final Environment environment = mock(Environment.class);
     private CanvasLaunchHandler handler;
     private Context context;
@@ -30,27 +34,36 @@ public class CanvasLaunchHandlerTest {
     @BeforeEach
     public void init() {
         when(environment.readEnv(ApiGatewayHandler.ALLOWED_ORIGIN_ENV)).thenReturn("*");
+        when(environment.readEnv(DLR_BASE_URL)).thenReturn(DLR_BASE_URL_VALUE);
+        when(environment.readEnv(API_HOST)).thenReturn(API_HOST_VALUE);
+
         context = mock(Context.class);
-        this.handler = new CanvasLaunchHandler();
+        this.handler = new CanvasLaunchHandler(environment);
         output = new ByteArrayOutputStream();
     }
 
     @Test
     void shouldRedirectOnSuccessfulLaunchRequest() throws IOException {
-        var expectedLocation = constructTest("inputWithServiceId.json").getHeaders().get("Location");
-        assertThat(expectedLocation, is(EXPECTED_LOCATION_FOR_EMBED_RICH_CONTENT_EDITOR));
+        var actualLocation = constructTest("inputWithServiceId.json").getHeaders().get("Location");
+        assertThat(actualLocation, is(EXPECTED_LOCATION_FOR_EMBED_RICH_CONTENT_EDITOR));
     }
 
     @Test
     void shouldReturnHTMLOnLaunchRequestWithoutServiceIdentifier() throws IOException {
-        var expectedHTML = constructTest("inputWithoutServiceId.json").getBody();
-        assertThat(expectedHTML, is(IoUtils.stringFromResources(Path.of("listOfServices.html"))));
+        var actualHTML = constructTest("inputWithoutServiceId.json").getBody();
+        assertThat(actualHTML, is(IoUtils.stringFromResources(Path.of("listOfServices.html"))));
     }
 
     @Test
     void shouldReturnXMLOnLaunchRequestWithCombinedServiceIdentifier() throws IOException {
-        var expectedXML = constructTest("inputWithCombinedServiceId.json").getBody();
-        assertThat(expectedXML, is(IoUtils.stringFromResources(Path.of("combined-cartridge-basiclti-link.xml"))));
+        var actualXML = constructTest("inputWithCombinedServiceId.json").getBody();
+        assertThat(actualXML, is(IoUtils.stringFromResources(Path.of("combined-cartridge-basiclti-link.xml"))));
+    }
+
+    @Test
+    void shouldConvertUnauthorizedLtiLaunchRequestToJsonError() throws IOException {
+        var actualJsonError = constructTest("inputWithUnknownConsumerKey.json").getBody();
+        assertThat(actualJsonError, is(IoUtils.stringFromResources(Path.of("unknownConsumerResponse.json"))));
     }
 
     private GatewayResponse<LtiLaunchHandler> constructTest(String requestJson) throws IOException {

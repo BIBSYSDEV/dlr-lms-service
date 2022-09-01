@@ -5,7 +5,6 @@ dependencies {
     implementation libs.bundles.jackson
     implementation libs.nva.apigateway
     implementation libs.bundles.logging
-    implementation libs.aws.events
 
     testImplementation libs.nva.testutils
 }

@@ -1,8 +1,6 @@
 package sikt.lti.tp;
 
-import no.unit.nva.commons.json.JsonSerializable;
-
-public class LtiLaunchResult implements JsonSerializable {
+public class LtiLaunchResult {
 
     private final int status;
     private final String contentType;

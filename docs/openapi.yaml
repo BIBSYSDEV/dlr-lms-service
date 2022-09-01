@@ -11,6 +11,13 @@ paths:
         name: serviceId
         schema:
           type: string
+          nullable: true
+          enum:
+            - combined
+            - site
+            - embedExternalTool
+            - embedRichContentEditor
+            - null
         required: true
 
     get:
@@ -25,7 +32,7 @@ paths:
         type: AWS_PROXY
       responses:
         '200':
-          description: ''
+          description: Request has succeeded, HTML or XML in response, depending on service identifier requested
           content:
             application/xml:
               schema:
@@ -34,7 +41,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/HTML'
         '304':
-          description: ''
+          description: Redirect succeeded
 
         '500':
           description: Unexpected error
@@ -43,9 +50,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '401':
-          description: Bad lti launch request
+          description: Bad lti launch request, unknown consumer key
           content:
-            text/plain:
+            application/json:
               schema:
                 $ref: '#/components/schemas/Error'
 
