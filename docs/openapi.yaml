@@ -5,59 +5,70 @@ info:
   license:
     name: MIT
 paths:
-  /lms:
-    post:
+  /lms/lti/canvas/{serviceId}:
+    parameters:
+      - in: path
+        name: serviceId
+        schema:
+          type: string
+        required: true
+
+    get:
       summary: ''
-      operationId: postEmail
-      security:
-        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend']
+      operationId: ltiLaunch
       tags:
-        - email
+        - canvas
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DlrLmsServiceFunction.Arn}/invocations
-        httpMethod: POST
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LmsCanvasLaunchFunction.Arn}/invocations
+        httpMethod: GET
         type: AWS_PROXY
       responses:
-        '201':
+        '200':
+          description: ''
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Cartridge'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/HTML'
+        '304':
           description: ''
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/Json'
         '500':
           description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '400':
-          description: Bad request
+        '401':
+          description: Bad lti launch request
           content:
-            application/json:
+            text/plain:
               schema:
                 $ref: '#/components/schemas/Error'
+
 components:
-  securitySchemes:
-    CognitoUserPool:
-      type: apiKey
-      name: Authorization
-      in: header
-      x-amazon-apigateway-authtype: cognito_user_pools
-      x-amazon-apigateway-authorizer:
-        type: cognito_user_pools
-        providerARNs:
-          - Ref:
-              CognitoAuthorizerArn
   schemas:
     Error:
       type: object
       required:
         - code
         - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
+    Cartridge:
+      type: object
+      xml:
+        name: cartridge_basiclti_link
+    HTML:
+      type: object
+    Json:
+      type: object
+
+
+
+
+
