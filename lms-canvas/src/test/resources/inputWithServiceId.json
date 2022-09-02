@@ -1,7 +1,7 @@
 {
   "path": "lms/canvas/v1/embedRichContentEditor",
   "queryStringParameters": {
-    "oauth_consumer_key": "key",
+    "oauth_consumer_key": "someSecretValue",
     "lti_message_type": "basic-lti-launch-request",
     "lti_version": "LTI-1p0",
     "resource_link_id": "resource_link_id",
