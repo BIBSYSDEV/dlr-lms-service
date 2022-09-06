@@ -31,11 +31,11 @@ Request from canvas has following parameters:
 }
 ```
 Valid values for identifier are following:
--  combined
--  site
--  embedExternalTool
--  embedContentEditor
--  empty space
+-   combined
+-   site
+-   embedExternalTool
+-   embedContentEditor
+-   empty space
 
 Query string parameters are default parameters, except oauth_consumer_key, which should be configured 
 in secrets manager. Request without query string parameters is also a valid request.
