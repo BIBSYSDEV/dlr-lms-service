@@ -1,25 +1,24 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Lambda sending emails
+  Lambda for launching DLR in Canvas
 
 Parameters:
-  CognitoAuthorizerArn:
-    Type: 'AWS::SSM::Parameter::Value<String>'
-    Description: Reference to Cognito UserPool for the stage
-    Default: CognitoAuthorizerArn
-  CustomDomain:
-    Type: 'AWS::SSM::Parameter::Value<String>'
-    Description: The default domain that is used as from_address
-    Default: CustomDomain
-  CustomDomainBasePath:
-    Type: String
-    Description: Base path mapping in CustomDomain
-    Default: email
   ApiDomain:
     Type: 'AWS::SSM::Parameter::Value<String>'
     Description: The Api domain
     Default: /NVA/ApiDomain
+  CustomDomainBasePath:
+    Type: String
+    Description: Base path mapping in CustomDomain
+    Default: lms
+  Suffix:
+    Type: String
+    Default: ''
+    Description: Suffix used for naming resources for feature branches to avoid conflicts.
+
+Conditions:
+  WithSuffix: !Not [ !Equals [ !Ref Suffix, '' ] ]
 
 Globals:
   Function:
@@ -28,7 +27,10 @@ Globals:
     Runtime: java11
 
 Resources:
-  LmsCanvasServiceRole:
+  ApiAccessLogGroup:
+    Type: AWS::Logs::LogGroup
+
+  LmsCanvasLaunchFunctionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -50,42 +52,43 @@ Resources:
                   - logs:PutLogEvents
                 Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*'
 
-  NvaLmsApi:
+  LmsCanvasLaunchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lms-rest
+      Handler: no.sikt.nva.lms.CanvasLaunchHandler::handleRequest
+      Role: !GetAtt LmsCanvasLaunchFunctionRole.Arn
+      Environment:
+        Variables:
+          API_HOST: !Ref ApiDomain
+          DLR_BASE_URL: !Ref ApiDomain
+          ALLOWED_ORIGIN: '*'
+    Events:
+      GetEvent:
+        Type: Api
+        Properties:
+          Path: /lms
+          Method: get
+          RestApiId: !Ref DLRLaunchApi
+
+  DLRLaunchApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: v1
-      EndpointConfiguration:
-        Type: REGIONAL
-      MethodSettings:
-        - ResourcePath: /lms
-          HttpMethod: POST
+      AccessLogSetting:
+        DestinationArn: !GetAtt ApiAccessLogGroup.Arn
+        Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
+      StageName: Prod
+      EndpointConfiguration: REGIONAL
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include
           Parameters:
             Location: ./docs/openapi.yaml
 
-  LmsCanvasLaunchFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: lms-canvas
-      Handler: no.sikt.nva.lms.CanvasLaunchHandler::handleRequest
-      Role: !GetAtt LmsCanvasServiceRole.Arn
-      Runtime: java11
-      MemorySize: 1798
-      Events:
-        Type: Api
-          Properties:
-            Path: /lms
-            Method: get
-            RestApiId: !Ref NvaLmsApi
-      Environment:
-        Variables:
-          ALLOWED_ORIGIN: '*'
-          API_HOST: !Ref ApiDomain
-          DLR_BASE_URL: !Ref ApiDomain
-        PutEvent:
-
+  #============================ Deploy API ============================================================================#
+  # This solves the problem described here:
+  # https://stackoverflow.com/questions/41423439/cloudformation-doesnt-deploy-to-api-gateway-stages-on-update
+  #====================================================================================================================#
   ApiGatewayCreateDeploymentLambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -107,8 +110,9 @@ Resources:
               - Effect: Allow
                 Action:
                   - apigateway:POST
-                Resource: !Sub 'arn:aws:apigateway:${AWS::Region}::/restapis/${NvaLmsApi}/deployments'
+                Resource: !Sub 'arn:aws:apigateway:${AWS::Region}::/restapis/${DLRLaunchApi}/deployments'
 
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-lambda-function-code-cfnresponsemodule.html
   ApiGatewayCreateDeploymentLambda:
     Type: AWS::Lambda::Function
     Properties:
@@ -141,15 +145,20 @@ Resources:
     Type: AWS::CloudFormation::CustomResource
     Properties:
       ServiceToken: !GetAtt ApiGatewayCreateDeploymentLambda.Arn
-      RestApiId: !Ref NvaLmsApi
-      StageName: !Ref NvaLmsApi.Stage
+      RestApiId: !Ref DLRLaunchApi
+      StageName: !Ref DLRLaunchApi.Stage
       Timestamp: '${BUILD_TIMESTAMP}'
-      AuthorizerArn: !Ref CognitoAuthorizerArn
 
-  LmsCanvasBasePathMapping:
+  #===========================BasePathMappings========================================================
+
+  NvaCoursesBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
-      BasePath: !Sub ${CustomDomainBasePath}
+      BasePath:
+        !If
+        - WithSuffix
+        - !Sub ${CustomDomainBasePath}-${Suffix}
+        - !Sub ${CustomDomainBasePath}
       DomainName: !Ref ApiDomain
-      RestApiId: !Ref NvaLmsApi
-      Stage: !Ref NvaLmsApi.Stage
+      RestApiId: !Ref DLRLaunchApi
+      Stage: !Ref DLRLaunchApi.Stage
