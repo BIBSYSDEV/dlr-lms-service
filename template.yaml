@@ -8,6 +8,10 @@ Parameters:
     Type: 'AWS::SSM::Parameter::Value<String>'
     Description: The Api domain
     Default: /NVA/ApiDomain
+  DlrApplicationDomain:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: The DLR Application domain
+    Default: /NVA/DlrApplicationDomain
   CustomDomainBasePath:
     Type: String
     Description: Base path mapping in CustomDomain
@@ -61,7 +65,7 @@ Resources:
       Environment:
         Variables:
           API_HOST: !Ref ApiDomain
-          DLR_BASE_URL: !Ref ApiDomain
+          DLR_BASE_URL: !Ref DlrApplicationDomain
           ALLOWED_ORIGIN: '*'
     Events:
       GetEvent:
