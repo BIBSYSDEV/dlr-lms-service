@@ -6,12 +6,12 @@ import static sikt.lti.tp.LtiLaunchParameter.LTI_MESSAGE_TYPE;
 import static sikt.lti.tp.LtiLaunchParameter.LTI_VERSION;
 import static sikt.lti.tp.LtiLaunchParameter.OAUTH_CONSUMER_KEY;
 import static sikt.lti.tp.LtiLaunchParameter.RESOURCE_LINK_ID;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import nva.commons.apigateway.RequestInfo;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.Test;
 import sikt.lti.tp.LtiLaunchHandler;
@@ -311,10 +311,10 @@ public class ApiGatewayLambdaLaunchHandlerTest {
 
         final URI apiHost = URI.create("https://api.loke.aws.unit.no");
         final URI dlrBaseUrl = URI.create("https://dlr.unit.no");
-        final APIGatewayV2HTTPEvent event = new APIGatewayV2HTTPEvent();
-        event.setRawPath("lms/canvas/v1/" + serviceIdentifier);
-        event.setQueryStringParameters(queryStringParameters);
+        final RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setPath("lms/canvas/v1/" + serviceIdentifier);
+        requestInfo.setQueryParameters(queryStringParameters);
 
-        return new ApiGatewayLambdaLaunchHandler(apiHost, dlrBaseUrl, knownConsumers, event);
+        return new ApiGatewayLambdaLaunchHandler(apiHost, dlrBaseUrl, knownConsumers, requestInfo);
     }
 }

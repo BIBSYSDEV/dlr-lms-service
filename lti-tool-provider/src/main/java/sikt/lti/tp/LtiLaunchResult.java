@@ -1,6 +1,7 @@
 package sikt.lti.tp;
 
 public class LtiLaunchResult {
+
     private final int status;
     private final String contentType;
     private final String body;

@@ -1,7 +1,12 @@
 
 dependencies {
     implementation libs.nva.core
-    implementation libs.aws.events
+    implementation libs.nva.json
+    implementation libs.bundles.jackson
+    implementation libs.nva.apigateway
+    implementation libs.bundles.logging
+
+    testImplementation libs.nva.testutils
 }
 
 test{

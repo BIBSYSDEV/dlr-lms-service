@@ -28,7 +28,7 @@ Globals:
     Runtime: java11
 
 Resources:
-  DlrLmsServiceRole:
+  LmsCanvasServiceRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -50,7 +50,7 @@ Resources:
                   - logs:PutLogEvents
                 Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*'
 
-  LmsGatewayAPI:
+  LmsCanvasGatewayAPI:
     Type: AWS::Serverless::Api
     Properties:
       StageName: v1
@@ -65,29 +65,31 @@ Resources:
           Parameters:
             Location: ./docs/openapi.yaml
 
-  DlrLmsServiceFunction:
+  LmsCanvasLaunchFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: lms-canvas
-      Handler: no.sikt.nva.lms.LmsRequestHandler::handleRequest
-      Role: !GetAtt DlrLmsServiceRole.Arn
+      Handler: no.sikt.nva.lms.CanvasLaunchHandler::handleRequest
+      Role: !GetAtt LmsCanvasServiceRole.Arn
       Runtime: java11
       MemorySize: 1798
+      Events:
+        Type: Api
+          Properties:
+            Path: /lms
+            Method: get
+            RestApiId: !Ref LmsCanvasGatewayApi
       Environment:
         Variables:
           ALLOWED_ORIGIN: '*'
-      Events:
-        SendEmailRequest:
-          Type: Api
-          Properties:
-            RestApiId: !Ref LmsGatewayAPI
-            Method: post
-            Path: /lms
+          API_HOST: !Ref ApiDomain
+          DLR_BASE_URL: !Ref ApiDomain
+        PutEvent:
 
-  LmsServiceBasePathMapping:
+  LmsCanvasBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
       BasePath: !Sub ${CustomDomainBasePath}
       DomainName: !Ref ApiDomain
-      RestApiId: !Ref LmsGatewayAPI
-      Stage: !Ref LmsGatewayAPI.Stage
+      RestApiId: !Ref LmsCanvasGatewayApi
+      Stage: !Ref LmsCanvasGatewayApi.Stage
