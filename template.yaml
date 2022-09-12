@@ -151,7 +151,7 @@ Resources:
 
   #===========================BasePathMappings========================================================
 
-  NvaCoursesBasePathMapping:
+  LmsCanvasBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
       BasePath:
