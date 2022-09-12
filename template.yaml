@@ -59,7 +59,7 @@ Resources:
   LmsCanvasLaunchFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lms-rest
+      CodeUri: lms-canvas
       Handler: no.sikt.nva.lms.CanvasLaunchHandler::handleRequest
       Role: !GetAtt LmsCanvasLaunchFunctionRole.Arn
       Environment:
