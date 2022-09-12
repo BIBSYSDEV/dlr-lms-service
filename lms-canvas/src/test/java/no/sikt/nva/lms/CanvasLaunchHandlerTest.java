@@ -43,7 +43,7 @@ public class CanvasLaunchHandlerTest {
         when(environment.readEnv(DLR_BASE_URL)).thenReturn(DLR_BASE_URL_VALUE);
         when(environment.readEnv(API_HOST)).thenReturn(API_HOST_VALUE);
         this.fakeSecretsManagerClient = new FakeSecretsManagerClient();
-        fakeSecretsManagerClient.putSecret("dev/dlr-lms-service/known-consumer-key-config", "knownConsumerKey",
+        fakeSecretsManagerClient.putSecret("sandbox/dlr-lms-service/known-consumer-key-config", "knownConsumerKey",
                                            SECRET_VALUE);
         context = mock(Context.class);
         this.handler = new CanvasLaunchHandler(environment, fakeSecretsManagerClient);
