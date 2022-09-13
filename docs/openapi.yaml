@@ -11,15 +11,6 @@ paths:
         name: serviceId
         schema:
           type: string
-          nullable: true
-          enum:
-            - combined
-            - site
-            - embedExternalTool
-            - embedRichContentEditor
-            - null
-        required: true
-
     get:
       summary: ''
       operationId: ltiLaunch
