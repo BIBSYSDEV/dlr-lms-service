@@ -71,7 +71,7 @@ Resources:
       GetEvent:
         Type: Api
         Properties:
-          Path: /lms
+          Path: /
           Method: get
           RestApiId: !Ref DLRLaunchApi
 
