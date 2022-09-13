@@ -46,8 +46,9 @@ public class CanvasLaunchHandlerTest {
         fakeSecretsManagerClient.putSecret("sandbox/dlr-lms-service/known-consumer-key-config", "knownConsumerKey",
                                            SECRET_VALUE);
         context = mock(Context.class);
-        this.handler = new CanvasLaunchHandler(environment, fakeSecretsManagerClient);
+        this.handler = new CanvasLaunchHandler(environment, new SecretsReader(fakeSecretsManagerClient));
         output = new ByteArrayOutputStream();
+
     }
 
     @Test

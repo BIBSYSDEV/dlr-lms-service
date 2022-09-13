@@ -1,19 +1,27 @@
 openapi: 3.0.0
 info:
   version: '1.0'
-  title: 'lms'
+  title: DLR Launch API
   license:
     name: MIT
 paths:
   /lms/lti/canvas/{serviceId}:
-    parameters:
-      - in: path
-        name: serviceId
-        schema:
-          type: string
-          nullable: true
     get:
-      summary: ''
+      summary: Launch DlR in Canvas
+
+      parameters:
+        - in: path
+          name: serviceId
+          schema:
+            type: string
+            nullable: true
+            enum:
+              - combined
+              - site
+              - embedExternalTool
+              - embedRichContentEditor
+              - null
+          required: true
       operationId: ltiLaunch
       tags:
         - canvas

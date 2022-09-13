@@ -11,7 +11,6 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.core.Environment;
 import nva.commons.secrets.SecretsReader;
 import sikt.lti.tp.aws.ApiGatewayLambdaLaunchHandler;
-import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 
 public class CanvasLaunchHandler extends ApiGatewayHandler<Void, String> {
 
@@ -22,11 +21,15 @@ public class CanvasLaunchHandler extends ApiGatewayHandler<Void, String> {
     private final URI apiHost;
     private final SecretsReader secretsReader;
 
-    public CanvasLaunchHandler(Environment environment, SecretsManagerClient secretsManagerClient) {
+    public CanvasLaunchHandler() {
+        this(new Environment(), new SecretsReader());
+    }
+
+    public CanvasLaunchHandler(Environment environment, SecretsReader secretsReader) {
         super(Void.class, environment);
         baseUrl = URI.create(environment.readEnv(DLR_BASE_URL));
         apiHost = URI.create(environment.readEnv(API_HOST));
-        this.secretsReader = new SecretsReader(secretsManagerClient);
+        this.secretsReader = secretsReader;
     }
 
     @Override
