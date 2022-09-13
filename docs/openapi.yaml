@@ -11,6 +11,7 @@ paths:
         name: serviceId
         schema:
           type: string
+          nullable: true
     get:
       summary: ''
       operationId: ltiLaunch
