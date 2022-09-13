@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
 import nva.commons.secrets.SecretsReader;
 import sikt.lti.tp.aws.ApiGatewayLambdaLaunchHandler;
 
@@ -21,6 +22,7 @@ public class CanvasLaunchHandler extends ApiGatewayHandler<Void, String> {
     private final URI apiHost;
     private final SecretsReader secretsReader;
 
+    @JacocoGenerated
     public CanvasLaunchHandler() {
         this(new Environment(), new SecretsReader());
     }
