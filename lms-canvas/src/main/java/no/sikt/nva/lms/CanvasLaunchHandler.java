@@ -37,7 +37,7 @@ public class CanvasLaunchHandler extends ApiGatewayHandler<Void, String> {
     @Override
     protected String processInput(Void input, RequestInfo requestInfo, Context context) throws LaunchException {
 
-        var knowConsumerKeyValue = this.secretsReader.fetchSecret("sandbox/dlr-lms-service/known-consumer-key-config",
+        var knowConsumerKeyValue = this.secretsReader.fetchSecret("consumerKey",
                                                                   "knownConsumerKey");
         knownConsumerKeys.add(knowConsumerKeyValue);
         ApiGatewayLambdaLaunchHandler handler = new ApiGatewayLambdaLaunchHandler(apiHost, baseUrl, knownConsumerKeys,
