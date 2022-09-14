@@ -20,7 +20,7 @@ Request from canvas has following parameters:
 
 ```json
 {
-    "pathParameters" : {
+  "pathParameters" : {
     "serviceId" : "combined"
   },
   "queryStringParameters": {
