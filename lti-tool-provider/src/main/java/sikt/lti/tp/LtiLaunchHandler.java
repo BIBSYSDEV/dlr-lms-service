@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import nva.commons.core.StringUtils;
-import nva.commons.core.paths.UnixPath;
 import nva.commons.core.paths.UriWrapper;
 import sikt.lti.tp.cc.CommonCartridgeGenerator;
 import sikt.lti.tp.cc.TemplateBasedCommonCartridgeGenerator;
@@ -165,10 +164,9 @@ public class LtiLaunchHandler {
         return builder.append("</body>\n</html>").toString();
     }
 
-    private Optional<ServiceIdentifier> getServiceIdentifier(final String path) {
-        final UnixPath unixPath = UnixPath.fromString(path);
+    private Optional<ServiceIdentifier> getServiceIdentifier(final String serviceId) {
         try {
-            return Optional.of(ServiceIdentifier.valueOf(unixPath.getLastPathElement()));
+            return Optional.of(ServiceIdentifier.valueOf(serviceId));
         } catch (IllegalArgumentException e) {
             return Optional.empty();
         }

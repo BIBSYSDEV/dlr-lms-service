@@ -206,7 +206,7 @@ public class ApiGatewayLambdaLaunchHandlerTest {
     }
 
     @Test
-    public void shouldReturnErrorOnLaunchWithParametersAndServiceIdentifierCombined() {
+    public void shouldReturnHTMLOnLaunchWithParametersAndServiceIdentifierCombined() {
         final QueryStringParametersBuilder builder = new QueryStringParametersBuilder();
         builder
             .withParameter(OAUTH_CONSUMER_KEY.getValue(), CONSUMER_KEY)
@@ -312,7 +312,7 @@ public class ApiGatewayLambdaLaunchHandlerTest {
         final URI apiHost = URI.create("https://api.loke.aws.unit.no");
         final URI dlrBaseUrl = URI.create("https://dlr.unit.no");
         final RequestInfo requestInfo = new RequestInfo();
-        requestInfo.setPath(serviceIdentifier);
+        requestInfo.setPathParameters(Collections.singletonMap("serviceId", serviceIdentifier));
         requestInfo.setQueryParameters(queryStringParameters);
 
         return new ApiGatewayLambdaLaunchHandler(apiHost, dlrBaseUrl, knownConsumers, requestInfo);

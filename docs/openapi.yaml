@@ -5,14 +5,13 @@ info:
   license:
     name: MIT
 paths:
-  /lms/lti/canvas:
+  /lms/lti/canvas/{serviceId}:
     parameters:
       - in: path
         name: serviceId
         schema:
           type: string
-          nullable: true
-
+          required: true
     get:
       summary: ''
       operationId: ltiLaunch

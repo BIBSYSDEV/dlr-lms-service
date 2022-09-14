@@ -13,7 +13,7 @@ public class ApiGatewayLambdaLaunchHandler extends LtiLaunchHandler {
                                          final RequestInfo requestInfo) {
         super(apiBaseUrl,
               dlrBaseUrl,
-              requestInfo.getPath(),
+              requestInfo.getPathParameter("serviceId"),
               requestInfo.getQueryParameters(),
               knownConsumers);
     }

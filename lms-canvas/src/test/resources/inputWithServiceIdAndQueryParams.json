@@ -1,5 +1,7 @@
 {
-  "path" :  "lms/canvas/embedRichContentEditor",
+  "pathParameters" : {
+    "serviceId" : "embedRichContentEditor"
+  },
   "queryStringParameters": {
     "oauth_consumer_key": "someSecretValue",
     "lti_message_type": "basic-lti-launch-request",
