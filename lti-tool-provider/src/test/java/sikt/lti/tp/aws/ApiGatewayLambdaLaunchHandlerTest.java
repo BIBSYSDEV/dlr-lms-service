@@ -312,7 +312,7 @@ public class ApiGatewayLambdaLaunchHandlerTest {
         final URI apiHost = URI.create("https://api.loke.aws.unit.no");
         final URI dlrBaseUrl = URI.create("https://dlr.unit.no");
         final RequestInfo requestInfo = new RequestInfo();
-        requestInfo.setPathParameters(Collections.singletonMap("serviceId", serviceIdentifier));
+        requestInfo.setPath(serviceIdentifier);
         requestInfo.setQueryParameters(queryStringParameters);
 
         return new ApiGatewayLambdaLaunchHandler(apiHost, dlrBaseUrl, knownConsumers, requestInfo);
