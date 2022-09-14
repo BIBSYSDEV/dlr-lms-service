@@ -83,7 +83,7 @@ Resources:
       GetEvent:
         Type: Api
         Properties:
-          Path: /lms/lti/canvas/{serviceId}
+          Path: /lms/lti/canvas
           Method: get
           RestApiId: !Ref DLRLaunchApi
 
