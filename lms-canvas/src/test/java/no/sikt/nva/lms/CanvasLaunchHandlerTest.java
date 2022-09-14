@@ -10,6 +10,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.nio.file.Path;
 import no.unit.nva.stubs.FakeSecretsManagerClient;
 import nva.commons.apigateway.ApiGatewayHandler;
@@ -43,30 +44,37 @@ public class CanvasLaunchHandlerTest {
         when(environment.readEnv(DLR_BASE_URL)).thenReturn(DLR_BASE_URL_VALUE);
         when(environment.readEnv(API_HOST)).thenReturn(API_HOST_VALUE);
         this.fakeSecretsManagerClient = new FakeSecretsManagerClient();
-        fakeSecretsManagerClient.putSecret("consumerKey", "knownConsumerKey",
-                                           SECRET_VALUE);
+        fakeSecretsManagerClient.putSecret("consumerKey", "knownConsumerKey", SECRET_VALUE);
         context = mock(Context.class);
         this.handler = new CanvasLaunchHandler(environment, new SecretsReader(fakeSecretsManagerClient));
         output = new ByteArrayOutputStream();
-
     }
 
     @Test
     void shouldRedirectOnSuccessfulLaunchRequest() throws IOException {
-        var actualLocation = constructTest("inputWithServiceIdAndQueryParams.json").getHeaders().get("Location");
+        var response = constructTest("inputWithServiceIdAndQueryParams.json");
+        var actualLocation = response.getHeaders().get("Location");
+        var actualStatusCode = response.getStatusCode();
         assertThat(actualLocation, is(EXPECTED_LOCATION_FOR_EMBED_RICH_CONTENT_EDITOR));
+        assertThat(actualStatusCode, is(equalTo(HttpURLConnection.HTTP_NOT_MODIFIED)));
     }
 
     @Test
     void shouldReturnDefaultCartridgeOnLaunchRequestWithCombinedServiceIdentifierAndNoQueryParams() throws IOException {
-        var actualXML = constructTest("inputWithCombinedServiceId.json").getBody();
-        assertThat(actualXML, is(IoUtils.stringFromResources(Path.of("combined-cartridge-basiclti-link.xml"))));
+        var response = constructTest("inputWithCombinedServiceId.json");
+        var actualStatusCode = response.getStatusCode();
+        var actualBody = response.getBody();
+        assertThat(actualStatusCode, is(equalTo(HttpURLConnection.HTTP_OK)));
+        assertThat(actualBody,
+                   is(IoUtils.stringFromResources(Path.of("combined-cartridge-basiclti-link.xml"))));
     }
 
     @Test
     void shouldConvertUnauthorizedLtiLaunchRequestToJsonError() throws IOException {
-        var actualJsonError = constructTest("inputWithUnknownConsumerKey.json").getBody();
-        assertThat(actualJsonError, is(IoUtils.stringFromResources(Path.of("unknownConsumerResponse.json"))));
+        var response = constructTest("inputWithUnknownConsumerKey.json");
+        var actualStatusCode = response.getStatusCode();
+        assertThat(actualStatusCode, is(equalTo(HttpURLConnection.HTTP_UNAUTHORIZED)));
+        assertThat(response.getBody(), is(IoUtils.stringFromResources(Path.of("unknownConsumerResponse.json"))));
     }
 
     @Test

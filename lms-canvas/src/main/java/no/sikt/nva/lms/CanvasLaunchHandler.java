@@ -11,6 +11,7 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.secrets.SecretsReader;
+import sikt.lti.tp.LtiLaunchResult;
 import sikt.lti.tp.aws.ApiGatewayLambdaLaunchHandler;
 
 public class CanvasLaunchHandler extends ApiGatewayHandler<Void, String> {
@@ -21,6 +22,8 @@ public class CanvasLaunchHandler extends ApiGatewayHandler<Void, String> {
     private final URI baseUrl;
     private final URI apiHost;
     private final SecretsReader secretsReader;
+
+    private LtiLaunchResult ltiLaunchResult;
 
     @JacocoGenerated
     public CanvasLaunchHandler() {
@@ -42,22 +45,22 @@ public class CanvasLaunchHandler extends ApiGatewayHandler<Void, String> {
         knownConsumerKeys.add(knowConsumerKeyValue);
         ApiGatewayLambdaLaunchHandler handler = new ApiGatewayLambdaLaunchHandler(apiHost, baseUrl, knownConsumerKeys,
                                                                                   requestInfo);
-        var launchResult = handler.execute();
-        String result;
-        if (launchResult.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-            throw new LaunchException(launchResult.getBody(), launchResult.getStatus());
-        } else if (launchResult.getStatus() == HttpURLConnection.HTTP_NOT_MODIFIED) {
-            addAdditionalHeaders(() -> Collections.singletonMap("Location", launchResult.getLocation()));
-            result = "";
+        ltiLaunchResult = handler.execute();
+        String responseBody;
+        if (ltiLaunchResult.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            throw new LaunchException(ltiLaunchResult.getBody(), ltiLaunchResult.getStatus());
+        } else if (ltiLaunchResult.getStatus() == HttpURLConnection.HTTP_NOT_MODIFIED) {
+            addAdditionalHeaders(() -> Collections.singletonMap("Location", ltiLaunchResult.getLocation()));
+            responseBody = "";
         } else {
-            addAdditionalHeaders(() -> Collections.singletonMap("Content-Type", launchResult.getContentType()));
-            result = launchResult.getBody();
+            addAdditionalHeaders(() -> Collections.singletonMap("Content-Type", ltiLaunchResult.getContentType()));
+            responseBody = ltiLaunchResult.getBody();
         }
-        return result;
+        return responseBody;
     }
 
     @Override
     protected Integer getSuccessStatusCode(Void input, String output) {
-        return HttpURLConnection.HTTP_OK;
+        return ltiLaunchResult.getStatus();
     }
 }
