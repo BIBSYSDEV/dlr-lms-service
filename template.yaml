@@ -79,13 +79,13 @@ Resources:
           API_HOST: !Ref ApiDomain
           DLR_BASE_URL: !Ref DlrApplicationDomain
           ALLOWED_ORIGIN: '*'
-    Events:
-      GetEvent:
-        Type: Api
-        Properties:
-          Path: /lms/lti/canvas/{serviceId}
-          Method: get
-          RestApiId: !Ref DLRLaunchApi
+      Events:
+        LtiLaunchRequest:
+          Type: Api
+          Properties:
+            Path: /lms/lti/canvas/{serviceId}
+            Method: get
+            RestApiId: !Ref DLRLaunchApi
 
   DLRLaunchApi:
     Type: AWS::Serverless::Api
@@ -96,7 +96,7 @@ Resources:
       StageName: Prod
       MethodSettings:
         - ResourcePath: /lms/lti/canvas/{serviceId}
-          HttpMethod: GET
+          HttpMethod: get
       EndpointConfiguration: REGIONAL
       DefinitionBody:
         'Fn::Transform':
@@ -109,11 +109,7 @@ Resources:
   LmsCanvasBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
-      BasePath:
-        !If
-        - WithSuffix
-        - !Sub ${CustomDomainBasePath}-${Suffix}
-        - !Sub ${CustomDomainBasePath}
+      BasePath: !Sub ${CustomDomainBasePath}
       DomainName: !Ref ApiDomain
       RestApiId: !Ref DLRLaunchApi
       Stage: !Ref DLRLaunchApi.Stage
