@@ -83,7 +83,7 @@ Resources:
         LtiLaunchRequest:
           Type: Api
           Properties:
-            Path: /lms/lti/canvas/{serviceId}
+            Path: /lti/canvas/{serviceId}
             Method: get
             RestApiId: !Ref DLRLaunchApi
 

@@ -5,7 +5,7 @@ info:
   license:
     name: MIT
 paths:
-  /lms/lti/canvas/{serviceId}:
+  /lti/canvas/{serviceId}:
     get:
       parameters:
         - name: serviceId
