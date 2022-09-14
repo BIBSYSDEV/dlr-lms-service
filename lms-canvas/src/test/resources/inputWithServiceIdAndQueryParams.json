@@ -1,5 +1,5 @@
 {
-  "path": "lms/canvas/v1/combined",
+  "path" :  "lms/canvas/embedRichContentEditor",
   "queryStringParameters": {
     "oauth_consumer_key": "someSecretValue",
     "lti_message_type": "basic-lti-launch-request",
@@ -8,3 +8,5 @@
     "launch_presentation_return_url": "https://example.com"
   }
 }
+
+

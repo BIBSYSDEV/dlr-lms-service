@@ -1,9 +1,6 @@
 {
-  "pathParameters" : {
-    "serviceId" : "embedRichContentEditor"
-  },
   "queryStringParameters": {
-    "oauth_consumer_key": "unknownKey",
+    "oauth_consumer_key": "someSecretValue",
     "lti_message_type": "basic-lti-launch-request",
     "lti_version": "LTI-1p0",
     "resource_link_id": "resource_link_id",

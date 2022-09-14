@@ -20,25 +20,25 @@ public class LtiLaunchHandler {
 
     private final URI apiBaseUrl;
     private final URI dlrBaseUrl;
-    private final String path;
+    private final String serviceId;
     private final Map<String, String> parameters;
     private final Set<String> knownConsumerKeys;
     private final CommonCartridgeGenerator commonCartridgeGenerator = new TemplateBasedCommonCartridgeGenerator();
 
     protected LtiLaunchHandler(final URI apiBaseUrl,
                                final URI dlrBaseUrl,
-                               final String path,
+                               final String serviceId,
                                final Map<String, String> parameters,
                                final Set<String> knownConsumerKeys) {
         this.apiBaseUrl = apiBaseUrl;
         this.dlrBaseUrl = dlrBaseUrl;
-        this.path = path;
+        this.serviceId = serviceId;
         this.parameters = parameters;
         this.knownConsumerKeys = knownConsumerKeys;
     }
 
     public LtiLaunchResult execute() {
-        final Optional<ServiceIdentifier> serviceIdentifier = getServiceIdentifier(path);
+        final Optional<ServiceIdentifier> serviceIdentifier = getServiceIdentifier(String.valueOf(serviceId));
 
         if (serviceIdentifier.isEmpty()) {
             return new LtiLaunchResult(200, TEXT_HTML, generateListOfServicesAsHtml());
@@ -167,7 +167,6 @@ public class LtiLaunchHandler {
 
     private Optional<ServiceIdentifier> getServiceIdentifier(final String path) {
         final UnixPath unixPath = UnixPath.fromString(path);
-
         try {
             return Optional.of(ServiceIdentifier.valueOf(unixPath.getLastPathElement()));
         } catch (IllegalArgumentException e) {

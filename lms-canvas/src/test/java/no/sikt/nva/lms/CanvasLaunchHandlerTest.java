@@ -53,18 +53,24 @@ public class CanvasLaunchHandlerTest {
 
     @Test
     void shouldRedirectOnSuccessfulLaunchRequest() throws IOException {
-        var actualLocation = constructTest("inputWithServiceId.json").getHeaders().get("Location");
+        var actualLocation = constructTest("inputWithServiceIdAndQueryParams.json").getHeaders().get("Location");
         assertThat(actualLocation, is(EXPECTED_LOCATION_FOR_EMBED_RICH_CONTENT_EDITOR));
     }
 
     @Test
-    void shouldReturnHTMLOnLaunchRequestWithoutServiceIdentifier() throws IOException {
-        var actualHTML = constructTest("inputWithoutServiceId.json").getBody();
+    void shouldReturnHTMLOnLaunchRequestWithEmptyServiceIdentifier() throws IOException {
+        var actualHTML = constructTest("inputWithEmptyServiceId.json").getBody();
         assertThat(actualHTML, is(IoUtils.stringFromResources(Path.of("listOfServices.html"))));
     }
 
     @Test
-    void shouldReturnXMLOnLaunchRequestWithCombinedServiceIdentifier() throws IOException {
+    void shouldReturnHTMLOnLaunchRequestWithoutPath() throws IOException {
+        var actualHTML = constructTest("inputWithoutPath.json").getBody();
+        assertThat(actualHTML, is(IoUtils.stringFromResources(Path.of("listOfServices.html"))));
+    }
+
+    @Test
+    void shouldReturnDefaultCartridgeOnLaunchRequestWithCombinedServiceIdentifierAndNoQueryParams() throws IOException {
         var actualXML = constructTest("inputWithCombinedServiceId.json").getBody();
         assertThat(actualXML, is(IoUtils.stringFromResources(Path.of("combined-cartridge-basiclti-link.xml"))));
     }
@@ -75,11 +81,11 @@ public class CanvasLaunchHandlerTest {
         assertThat(actualJsonError, is(IoUtils.stringFromResources(Path.of("unknownConsumerResponse.json"))));
     }
 
-    @Test
-    void shouldConvert500ResponseToJsonError() throws IOException {
-        var actualJsonError = constructTest("inputWithoutPathParameter.json").getBody();
-        assertThat(actualJsonError, is(IoUtils.stringFromResources(Path.of("500ServerResponse.json"))));
-    }
+//    @Test
+//    void shouldConvert500ResponseToJsonError() throws IOException {
+//        var actualJsonError = constructTest("inputWithoutPathParameter.json").getBody();
+//        assertThat(actualJsonError, is(IoUtils.stringFromResources(Path.of("500ServerResponse.json"))));
+//    }
 
     @Test
     void shouldReadSecretKeyValue() {
