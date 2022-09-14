@@ -43,7 +43,7 @@ public class CanvasLaunchHandlerTest {
         when(environment.readEnv(DLR_BASE_URL)).thenReturn(DLR_BASE_URL_VALUE);
         when(environment.readEnv(API_HOST)).thenReturn(API_HOST_VALUE);
         this.fakeSecretsManagerClient = new FakeSecretsManagerClient();
-        fakeSecretsManagerClient.putSecret("sandbox/dlr-lms-service/known-consumer-key-config", "knownConsumerKey",
+        fakeSecretsManagerClient.putSecret("consumerKey", "knownConsumerKey",
                                            SECRET_VALUE);
         context = mock(Context.class);
         this.handler = new CanvasLaunchHandler(environment, new SecretsReader(fakeSecretsManagerClient));
@@ -57,18 +57,6 @@ public class CanvasLaunchHandlerTest {
         assertThat(actualLocation, is(EXPECTED_LOCATION_FOR_EMBED_RICH_CONTENT_EDITOR));
     }
 
-//    @Test
-//    void shouldReturnHTMLOnLaunchRequestWithEmptyServiceIdentifier() throws IOException {
-//        var actualHTML = constructTest("inputWithEmptyServiceId.json").getBody();
-//        assertThat(actualHTML, is(IoUtils.stringFromResources(Path.of("listOfServices.html"))));
-//    }
-
-//    @Test
-//    void shouldReturnHTMLOnLaunchRequestWithoutPath() throws IOException {
-//        var actualHTML = constructTest("inputWithoutPath.json").getBody();
-//        assertThat(actualHTML, is(IoUtils.stringFromResources(Path.of("listOfServices.html"))));
-//    }
-
     @Test
     void shouldReturnDefaultCartridgeOnLaunchRequestWithCombinedServiceIdentifierAndNoQueryParams() throws IOException {
         var actualXML = constructTest("inputWithCombinedServiceId.json").getBody();
@@ -80,12 +68,6 @@ public class CanvasLaunchHandlerTest {
         var actualJsonError = constructTest("inputWithUnknownConsumerKey.json").getBody();
         assertThat(actualJsonError, is(IoUtils.stringFromResources(Path.of("unknownConsumerResponse.json"))));
     }
-
-//    @Test
-//    void shouldConvert500ResponseToJsonError() throws IOException {
-//        var actualJsonError = constructTest("inputWithoutPathParameter.json").getBody();
-//        assertThat(actualJsonError, is(IoUtils.stringFromResources(Path.of("500ServerResponse.json"))));
-//    }
 
     @Test
     void shouldReadSecretKeyValue() {
