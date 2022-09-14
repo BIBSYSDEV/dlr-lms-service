@@ -20,7 +20,9 @@ Request from canvas has following parameters:
 
 ```json
 {
-  "path": "lms/canvas/v1/{serviceIdentifier}",
+  "pathParameters" : {
+    "serviceId" : "combined"
+  },
   "queryStringParameters": {
     "oauth_consumer_key": "knownCustomerKey",
     "lti_message_type": "basic-lti-launch-request",
