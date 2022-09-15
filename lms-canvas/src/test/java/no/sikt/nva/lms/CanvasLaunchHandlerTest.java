@@ -1,5 +1,7 @@
 package no.sikt.nva.lms;
 
+import static no.sikt.nva.lms.CanvasLaunchHandler.DLR_APPLICATION_DOMAIN_ENV_NAME;
+import static no.sikt.nva.lms.CanvasLaunchHandler.NVA_APPLICATION_DOMAIN_ENV_NAME;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -24,13 +26,11 @@ import sikt.lti.tp.LtiLaunchHandler;
 
 public class CanvasLaunchHandlerTest {
 
-    private static final String DLR_BASE_URL_VALUE = "https://dlr.unit.no";
-    private static final String API_HOST_VALUE = "https://api.loke.aws.unit.no";
+    private static final String DLR_BASE_URL_VALUE = "frontend.sandbox.dlr.aws.unit.no";
+    private static final String API_HOST_VALUE = "api.sandbox.nva.aws.unit.no";
     private static final String EXPECTED_LOCATION_FOR_EMBED_RICH_CONTENT_EDITOR =
-        "https://dlr.unit.no?forceAuthentication=true&canvasShowEmbedButton"
+        "https://frontend.sandbox.dlr.aws.unit.no?forceAuthentication=true&canvasShowEmbedButton"
         + "=true&canvasIframeResize=true&canvasLaunchPresentationReturnUrl=https://example.com";
-    private static final String DLR_BASE_URL = "DLR_BASE_URL";
-    private static final String API_HOST = "API_HOST";
     private static final String SECRET_VALUE = "someSecretValue"; // same secret is used in .json test files
     final Environment environment = mock(Environment.class);
     private CanvasLaunchHandler handler;
@@ -41,8 +41,8 @@ public class CanvasLaunchHandlerTest {
     @BeforeEach
     public void init() {
         when(environment.readEnv(ApiGatewayHandler.ALLOWED_ORIGIN_ENV)).thenReturn("*");
-        when(environment.readEnv(DLR_BASE_URL)).thenReturn(DLR_BASE_URL_VALUE);
-        when(environment.readEnv(API_HOST)).thenReturn(API_HOST_VALUE);
+        when(environment.readEnv(DLR_APPLICATION_DOMAIN_ENV_NAME)).thenReturn(DLR_BASE_URL_VALUE);
+        when(environment.readEnv(NVA_APPLICATION_DOMAIN_ENV_NAME)).thenReturn(API_HOST_VALUE);
         this.fakeSecretsManagerClient = new FakeSecretsManagerClient();
         fakeSecretsManagerClient.putSecret("consumerKey", "knownConsumerKey", SECRET_VALUE);
         context = mock(Context.class);

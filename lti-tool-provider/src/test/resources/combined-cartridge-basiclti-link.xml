@@ -13,7 +13,7 @@ http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv
       <lticm:property name="icon_url">https://dlr.unit.no/favicon.ico</lticm:property>
       <lticm:property name="selection_width">800</lticm:property>
       <lticm:property name="selection_height">800</lticm:property>
-      <lticm:property name="url">https://api.loke.aws.unit.no/lms/canvas/v1/embedExternalTool</lticm:property>
+      <lticm:property name="url">https://api.sandbox.nva.aws.unit.no/lms/canvas/v1/embedExternalTool</lticm:property>
       <lticm:property name="text">Embed content from the DLR repository</lticm:property>
       <lticm:property name="enabled">true</lticm:property>
     </lticm:options>
@@ -21,19 +21,19 @@ http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv
       <lticm:property name="icon_url">https://dlr.unit.no/favicon.ico</lticm:property>
       <lticm:property name="selection_width">800</lticm:property>
       <lticm:property name="selection_height">800</lticm:property>
-      <lticm:property name="url">https://api.loke.aws.unit.no/lms/canvas/v1/embedRichContentEditor</lticm:property>
+      <lticm:property name="url">https://api.sandbox.nva.aws.unit.no/lms/canvas/v1/embedRichContentEditor</lticm:property>
       <lticm:property name="text">Embed content from the DLR repository</lticm:property>
       <lticm:property name="enabled">true</lticm:property>
     </lticm:options>
     <lticm:options name="course_navigation">
       <lticm:property name="visibility">public</lticm:property>
       <lticm:property name="default">enabled</lticm:property>
-      <lticm:property name="url">https://api.loke.aws.unit.no/lms/canvas/v1/site</lticm:property>
+      <lticm:property name="url">https://api.sandbox.nva.aws.unit.no/lms/canvas/v1/site</lticm:property>
       <lticm:property name="text">DLR</lticm:property>
       <lticm:property name="enabled">true</lticm:property>
     </lticm:options>
   </blti:extensions>
-  <blti:launch_url>https://api.loke.aws.unit.no/lms/canvas/v1/combined</blti:launch_url>
+  <blti:launch_url>https://api.sandbox.nva.aws.unit.no/lms/canvas/v1/combined</blti:launch_url>
   <blti:icon>https://dlr.unit.no/favicon.ico</blti:icon>
   <blti:vendor>
     <lticp:code>bibsys.no</lticp:code>

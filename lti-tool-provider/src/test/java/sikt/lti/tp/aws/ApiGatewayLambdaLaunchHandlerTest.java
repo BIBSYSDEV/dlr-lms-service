@@ -242,7 +242,7 @@ public class ApiGatewayLambdaLaunchHandlerTest {
 
         final LtiLaunchResult result = launchHandler.execute();
 
-        final String expectedLocation = "https://dlr.unit.no?forceAuthentication=true&canvasIframeResize=true";
+        final String expectedLocation = "https://frontend.sandbox.dlr.aws.unit.no?forceAuthentication=true&canvasIframeResize=true";
 
         assertThat(result.getStatus(), is(302));
         assertThat(result.getLocation(), is(expectedLocation));
@@ -263,7 +263,7 @@ public class ApiGatewayLambdaLaunchHandlerTest {
 
         final LtiLaunchResult result = launchHandler.execute();
 
-        final String expectedLocation = "https://dlr.unit.no?forceAuthentication=true&canvasShowEmbedLinkButton=true"
+        final String expectedLocation = "https://frontend.sandbox.dlr.aws.unit.no?forceAuthentication=true&canvasShowEmbedLinkButton=true"
                                         + "&canvasIframeResize=true&canvasLaunchPresentationReturnUrl=null";
 
         assertThat(result.getStatus(), is(302));
@@ -285,7 +285,7 @@ public class ApiGatewayLambdaLaunchHandlerTest {
 
         final LtiLaunchResult result = launchHandler.execute();
 
-        final String expectedLocation = "https://dlr.unit.no?forceAuthentication=true&canvasShowEmbedButton=true"
+        final String expectedLocation = "https://frontend.sandbox.dlr.aws.unit.no?forceAuthentication=true&canvasShowEmbedButton=true"
                                         + "&canvasIframeResize=true&canvasLaunchPresentationReturnUrl=null";
 
         assertThat(result.getStatus(), is(302));
@@ -309,8 +309,8 @@ public class ApiGatewayLambdaLaunchHandlerTest {
                                                  final String serviceIdentifier,
                                                  final Map<String, String> queryStringParameters) {
 
-        final URI apiHost = URI.create("https://api.loke.aws.unit.no");
-        final URI dlrBaseUrl = URI.create("https://dlr.unit.no");
+        final URI apiHost = URI.create("https://api.sandbox.nva.aws.unit.no");
+        final URI dlrBaseUrl = URI.create("https://frontend.sandbox.dlr.aws.unit.no");
         final RequestInfo requestInfo = new RequestInfo();
         requestInfo.setPathParameters(Collections.singletonMap("serviceId", serviceIdentifier));
         requestInfo.setQueryParameters(queryStringParameters);

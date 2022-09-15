@@ -152,7 +152,7 @@ public class LtiLaunchHandler {
 
         for (ServiceIdentifier identifier : ServiceIdentifier.values()) {
             final UriWrapper uriWrapper = UriWrapper.fromUri(apiBaseUrl)
-                                              .addChild("lms", "canvas", "v1", identifier.name());
+                                              .addChild("lms", "lti", "canvas", identifier.name());
             final String url = uriWrapper.toString();
             builder.append("<a href=\"")
                 .append(uriWrapper)

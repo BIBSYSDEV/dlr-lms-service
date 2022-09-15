@@ -14,7 +14,4 @@ dependencies {
 }
 
 test {
-    environment "ALLOWED_ORIGIN", "* "
-    environment "DLR_BASE_URL", "someUrl"
-    environment "API_HOST", "someHost"
 }

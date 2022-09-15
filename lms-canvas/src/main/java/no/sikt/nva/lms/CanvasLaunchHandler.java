@@ -10,17 +10,20 @@ import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.paths.UriWrapper;
 import nva.commons.secrets.SecretsReader;
 import sikt.lti.tp.LtiLaunchResult;
 import sikt.lti.tp.aws.ApiGatewayLambdaLaunchHandler;
 
 public class CanvasLaunchHandler extends ApiGatewayHandler<Void, String> {
 
-    private static final String DLR_BASE_URL = "DLR_BASE_URL";
-    private static final String API_HOST = "API_HOST";
+
+    /* default */ static final String DLR_APPLICATION_DOMAIN_ENV_NAME = "/NVA/DlrApplicationDomain";
+    /* default */ static final String NVA_APPLICATION_DOMAIN_ENV_NAME = "/NVA/ApiDomain";
+    private static final String HTTPS_SCHEME = UriWrapper.HTTPS + "://";
     private final Set<String> knownConsumerKeys = new ConcurrentSkipListSet<>();
-    private final URI baseUrl;
-    private final URI apiHost;
+    private final URI frontendBaseUrl;
+    private final URI apiBaseUrl;
     private final SecretsReader secretsReader;
 
     private LtiLaunchResult ltiLaunchResult;
@@ -32,9 +35,13 @@ public class CanvasLaunchHandler extends ApiGatewayHandler<Void, String> {
 
     public CanvasLaunchHandler(Environment environment, SecretsReader secretsReader) {
         super(Void.class, environment);
-        baseUrl = URI.create(environment.readEnv(DLR_BASE_URL));
-        apiHost = URI.create(environment.readEnv(API_HOST));
+        this.frontendBaseUrl = getBaseUrlFromHost(environment, DLR_APPLICATION_DOMAIN_ENV_NAME);
+        this.apiBaseUrl = getBaseUrlFromHost(environment, NVA_APPLICATION_DOMAIN_ENV_NAME);
         this.secretsReader = secretsReader;
+    }
+
+    private URI getBaseUrlFromHost(Environment environment, String dlrApplicationDomainEnvName) {
+        return UriWrapper.fromUri(HTTPS_SCHEME + environment.readEnv(dlrApplicationDomainEnvName)).getUri();
     }
 
     @Override
@@ -43,7 +50,7 @@ public class CanvasLaunchHandler extends ApiGatewayHandler<Void, String> {
         var knowConsumerKeyValue = this.secretsReader.fetchSecret("consumerKey",
                                                                   "knownConsumerKey");
         knownConsumerKeys.add(knowConsumerKeyValue);
-        ApiGatewayLambdaLaunchHandler handler = new ApiGatewayLambdaLaunchHandler(apiHost, baseUrl, knownConsumerKeys,
+        ApiGatewayLambdaLaunchHandler handler = new ApiGatewayLambdaLaunchHandler(apiBaseUrl, frontendBaseUrl, knownConsumerKeys,
                                                                                   requestInfo);
         ltiLaunchResult = handler.execute();
         String responseBody;
