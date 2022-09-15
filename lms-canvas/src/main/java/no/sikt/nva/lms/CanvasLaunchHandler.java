@@ -49,7 +49,7 @@ public class CanvasLaunchHandler extends ApiGatewayHandler<Void, String> {
         String responseBody;
         if (ltiLaunchResult.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
             throw new LaunchException(ltiLaunchResult.getBody(), ltiLaunchResult.getStatus());
-        } else if (ltiLaunchResult.getStatus() == HttpURLConnection.HTTP_MOVED_PERM) {
+        } else if (ltiLaunchResult.getStatus() == HttpURLConnection.HTTP_MOVED_TEMP) {
             addAdditionalHeaders(() -> Collections.singletonMap("Location", ltiLaunchResult.getLocation()));
             responseBody = "";
         } else {

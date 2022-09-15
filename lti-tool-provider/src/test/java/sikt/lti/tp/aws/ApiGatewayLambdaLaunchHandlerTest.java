@@ -244,7 +244,7 @@ public class ApiGatewayLambdaLaunchHandlerTest {
 
         final String expectedLocation = "https://dlr.unit.no?forceAuthentication=true&canvasIframeResize=true";
 
-        assertThat(result.getStatus(), is(301));
+        assertThat(result.getStatus(), is(302));
         assertThat(result.getLocation(), is(expectedLocation));
     }
 
@@ -266,7 +266,7 @@ public class ApiGatewayLambdaLaunchHandlerTest {
         final String expectedLocation = "https://dlr.unit.no?forceAuthentication=true&canvasShowEmbedLinkButton=true"
                                         + "&canvasIframeResize=true&canvasLaunchPresentationReturnUrl=null";
 
-        assertThat(result.getStatus(), is(301));
+        assertThat(result.getStatus(), is(302));
         assertThat(result.getLocation(), is(expectedLocation));
     }
 
@@ -288,7 +288,7 @@ public class ApiGatewayLambdaLaunchHandlerTest {
         final String expectedLocation = "https://dlr.unit.no?forceAuthentication=true&canvasShowEmbedButton=true"
                                         + "&canvasIframeResize=true&canvasLaunchPresentationReturnUrl=null";
 
-        assertThat(result.getStatus(), is(301));
+        assertThat(result.getStatus(), is(302));
         assertThat(result.getLocation(), is(expectedLocation));
     }
 

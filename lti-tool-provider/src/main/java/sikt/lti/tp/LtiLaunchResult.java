@@ -15,7 +15,7 @@ public class LtiLaunchResult {
     }
 
     public LtiLaunchResult(final String location) {
-        this.status = 301;
+        this.status = 302;
         this.contentType = "";
         this.body = "";
         this.location = location;
