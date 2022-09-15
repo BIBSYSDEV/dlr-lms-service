@@ -76,8 +76,8 @@ Resources:
       Role: !GetAtt LmsCanvasLaunchFunctionRole.Arn
       Environment:
         Variables:
-          API_HOST: !Ref ApiDomain
-          DLR_BASE_URL: !Ref DlrApplicationDomain
+          ApiDomain: !Ref ApiDomain
+          DlrApplicationDomain: !Ref DlrApplicationDomain
           ALLOWED_ORIGIN: '*'
       Events:
         LtiLaunchRequest:

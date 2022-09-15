@@ -18,8 +18,8 @@ import sikt.lti.tp.aws.ApiGatewayLambdaLaunchHandler;
 public class CanvasLaunchHandler extends ApiGatewayHandler<Void, String> {
 
 
-    /* default */ static final String DLR_APPLICATION_DOMAIN_ENV_NAME = "/NVA/DlrApplicationDomain";
-    /* default */ static final String NVA_APPLICATION_DOMAIN_ENV_NAME = "/NVA/ApiDomain";
+    /* default */ static final String DLR_APPLICATION_DOMAIN_ENV_NAME = "DlrApplicationDomain";
+    /* default */ static final String NVA_APPLICATION_DOMAIN_ENV_NAME = "ApiDomain";
     private static final String HTTPS_SCHEME = UriWrapper.HTTPS + "://";
     private final Set<String> knownConsumerKeys = new ConcurrentSkipListSet<>();
     private final URI frontendBaseUrl;
