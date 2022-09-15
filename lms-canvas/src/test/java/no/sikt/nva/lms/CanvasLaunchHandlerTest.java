@@ -56,7 +56,7 @@ public class CanvasLaunchHandlerTest {
         var actualLocation = response.getHeaders().get("Location");
         var actualStatusCode = response.getStatusCode();
         assertThat(actualLocation, is(EXPECTED_LOCATION_FOR_EMBED_RICH_CONTENT_EDITOR));
-        assertThat(actualStatusCode, is(equalTo(HttpURLConnection.HTTP_MOVED_TEMP)));
+        assertThat(actualStatusCode, is(equalTo(HttpURLConnection.HTTP_MOVED_PERM)));
     }
 
     @Test
